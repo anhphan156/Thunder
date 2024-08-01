@@ -15,6 +15,15 @@
   in {
     devShells."${system}".default = pkgs.mkShell {
       packages = with pkgs; [
+        vulkan-tools
+        vulkan-loader
+        vulkan-headers
+        vulkan-validation-layers
+				glfw
+        glfw-wayland
+				wayland
+        glm
+        shaderc
         libxkbcommon
       ];
       shellHook = "exec zsh";
