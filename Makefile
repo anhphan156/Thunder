@@ -33,8 +33,3 @@ leak-check:
 
 clean:
 	rm -rf $(BUILD_DIR) $(EXECUTABLE)
-
-# router password Capslock445
-# default wifi name WIFI-256C
-# default wifi password arctic9157chart
-# WPS PIN 12014767
