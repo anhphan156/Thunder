@@ -19,14 +19,25 @@
         vulkan-loader
         vulkan-headers
         vulkan-validation-layers
-				glfw
+        glfw
         glfw-wayland
-				wayland
+        wayland
         glm
         shaderc
         libxkbcommon
       ];
-      shellHook = "exec zsh";
+      shellHook = ''
+               #!/usr/bin/env bash
+
+        SOCKET_NAME=VK
+              SESSION_NAME=VK
+        tmux -L $SOCKET_NAME new-session -d -s $SESSION_NAME
+        tmux -L $SOCKET_NAME send-keys -t $SESSION_NAME:0.0 " nvim" Enter
+              tmux -L $SOCKET_NAME split-window -v
+              tmux -L $SOCKET_NAME select-pane -t 0
+              tmux -L $SOCKET_NAME resize-pane -D 6
+              tmux -L $SOCKET_NAME attach -t $SESSION_NAME
+      '';
     };
   };
 }
