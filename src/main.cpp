@@ -32,7 +32,7 @@ private:
     glfwSetErrorCallback(on_err);
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-    glfwWindowHint(GLFW_PLATFORM, GLFW_PLATFORM_WAYLAND);
+    /*glfwWindowHint(GLFW_PLATFORM, GLFW_PLATFORM_WAYLAND);*/
 
     window = glfwCreateWindow(WIDTH, HEIGHT, "GLFW", nullptr, nullptr);
   }
@@ -43,6 +43,7 @@ private:
     }
   }
   void cleanup() {
+    vkDestroyInstance(instance, nullptr);
     glfwDestroyWindow(window);
     glfwTerminate();
   }
@@ -54,6 +55,22 @@ private:
     appInfo.pEngineName = "No Engine";
     appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
     appInfo.apiVersion = VK_API_VERSION_1_0;
+
+    uint32_t glfwExtensionCount = 0;
+    const char **glfwExtensions;
+    glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+
+    VkInstanceCreateInfo createInfo{};
+    createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+    createInfo.pApplicationInfo = &appInfo;
+    createInfo.enabledExtensionCount = glfwExtensionCount;
+    createInfo.ppEnabledExtensionNames = glfwExtensions;
+    createInfo.enabledLayerCount = 0;
+
+    VkResult result = vkCreateInstance(&createInfo, nullptr, &instance);
+    if (result != VK_SUCCESS) {
+      throw std::runtime_error("failed to create instance");
+    }
   }
 };
 
