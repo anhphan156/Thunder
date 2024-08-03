@@ -16,6 +16,8 @@ class Application {
   private:
     VkInstance         instance;
     VkPhysicalDevice   physicalDevice = VK_NULL_HANDLE; // Physical device is implicitly destroyed when instance is destroyed
+    VkDevice           device;
+    VkQueue            graphicQueue;
     class GLFWwindow  *window;
     void               initVulkan();
     void               mainLoop();
@@ -23,6 +25,7 @@ class Application {
     void               initWindow();
     void               createInstance();
     void               pickPhysicalDevice();
+    void               createLogicalDevice();
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
     bool               isDeviceSuitable(VkPhysicalDevice device);
     bool               checkValidationLayerSupport();

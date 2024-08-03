@@ -1,6 +1,8 @@
 #include "application.hpp"
 
+#include <cstdint>
 #include <cstring>
+#include <vulkan/vulkan_core.h>
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
@@ -33,6 +35,7 @@ void Application::run() {
 void Application::initVulkan() {
     createInstance();
     pickPhysicalDevice();
+    createLogicalDevice();
 }
 
 void Application::mainLoop() {
@@ -42,6 +45,7 @@ void Application::mainLoop() {
 }
 
 void Application::cleanup() {
+    vkDestroyDevice(device, nullptr);
     vkDestroyInstance(instance, nullptr);
     glfwDestroyWindow(window);
     glfwTerminate();
@@ -116,6 +120,39 @@ void Application::pickPhysicalDevice() {
         throw std::runtime_error("failed to find a suitable gpu");
     }
 }
+
+void Application::createLogicalDevice() {
+    QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
+
+    float                   priority = 1.0f;
+    VkDeviceQueueCreateInfo queueCreateInfo{};
+    queueCreateInfo.sType            = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.value();
+    queueCreateInfo.queueCount       = 1;
+    queueCreateInfo.pQueuePriorities = &priority;
+
+    VkPhysicalDeviceFeatures deviceFeatures{};
+    VkDeviceCreateInfo       deviceCreateInfo{};
+    deviceCreateInfo.sType                 = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    deviceCreateInfo.pQueueCreateInfos     = &queueCreateInfo;
+    deviceCreateInfo.queueCreateInfoCount  = 1;
+    deviceCreateInfo.pEnabledFeatures      = &deviceFeatures;
+    deviceCreateInfo.enabledExtensionCount = 0;
+
+    if (enableValidationLayers) {
+        deviceCreateInfo.enabledLayerCount   = static_cast<uint32_t>(validationLayers.size());
+        deviceCreateInfo.ppEnabledLayerNames = validationLayers.data();
+    } else {
+        deviceCreateInfo.enabledLayerCount = 0;
+    }
+
+    if (vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &device) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create logical device");
+    }
+
+    vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicQueue);
+}
+
 Application::QueueFamilyIndices Application::findQueueFamilies(VkPhysicalDevice device) {
     QueueFamilyIndices indices;
 
