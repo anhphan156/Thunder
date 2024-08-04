@@ -11,19 +11,27 @@ class Application {
   private:
     struct QueueFamilyIndices {
         std::optional<unsigned int> graphicsFamily;
+        std::optional<unsigned int> presentFamily;
+
+        bool isComplete() {
+            return graphicsFamily.has_value() && presentFamily.has_value();
+        }
     };
 
   private:
     VkInstance         instance;
+    VkSurfaceKHR       surface;
     VkPhysicalDevice   physicalDevice = VK_NULL_HANDLE; // Physical device is implicitly destroyed when instance is destroyed
     VkDevice           device;
     VkQueue            graphicQueue;
+    VkQueue            presentQueue;
     class GLFWwindow  *window;
     void               initVulkan();
     void               mainLoop();
     void               cleanup();
     void               initWindow();
     void               createInstance();
+    void               createSurface();
     void               pickPhysicalDevice();
     void               createLogicalDevice();
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);

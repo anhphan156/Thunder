@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <set>
 #include <vulkan/vulkan_core.h>
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -34,6 +35,7 @@ void Application::run() {
 
 void Application::initVulkan() {
     createInstance();
+    createSurface();
     pickPhysicalDevice();
     createLogicalDevice();
 }
@@ -46,6 +48,7 @@ void Application::mainLoop() {
 
 void Application::cleanup() {
     vkDestroyDevice(device, nullptr);
+    vkDestroySurfaceKHR(instance, surface, nullptr);
     vkDestroyInstance(instance, nullptr);
     glfwDestroyWindow(window);
     glfwTerminate();
@@ -99,6 +102,12 @@ void Application::createInstance() {
     }
 }
 
+void Application::createSurface() {
+    if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS) {
+        throw std::runtime_error("Failed to create window surface");
+    }
+}
+
 void Application::pickPhysicalDevice() {
     uint32_t deviceCount = 0;
     vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
@@ -122,20 +131,25 @@ void Application::pickPhysicalDevice() {
 }
 
 void Application::createLogicalDevice() {
-    QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
+    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+    QueueFamilyIndices                   indices             = findQueueFamilies(physicalDevice);
+    std::set<uint32_t>                   uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};
 
-    float                   priority = 1.0f;
-    VkDeviceQueueCreateInfo queueCreateInfo{};
-    queueCreateInfo.sType            = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-    queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.value();
-    queueCreateInfo.queueCount       = 1;
-    queueCreateInfo.pQueuePriorities = &priority;
+    float priority = 1.0f;
+    for (uint32_t queueFamily : uniqueQueueFamilies) {
+        VkDeviceQueueCreateInfo queueCreateInfo{};
+        queueCreateInfo.sType            = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        queueCreateInfo.queueFamilyIndex = queueFamily;
+        queueCreateInfo.queueCount       = 1;
+        queueCreateInfo.pQueuePriorities = &priority;
+        queueCreateInfos.push_back(queueCreateInfo);
+    }
 
     VkPhysicalDeviceFeatures deviceFeatures{};
     VkDeviceCreateInfo       deviceCreateInfo{};
     deviceCreateInfo.sType                 = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-    deviceCreateInfo.pQueueCreateInfos     = &queueCreateInfo;
-    deviceCreateInfo.queueCreateInfoCount  = 1;
+    deviceCreateInfo.pQueueCreateInfos     = queueCreateInfos.data();
+    deviceCreateInfo.queueCreateInfoCount  = static_cast<uint32_t>(queueCreateInfos.size());
     deviceCreateInfo.pEnabledFeatures      = &deviceFeatures;
     deviceCreateInfo.enabledExtensionCount = 0;
 
@@ -151,6 +165,7 @@ void Application::createLogicalDevice() {
     }
 
     vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicQueue);
+    vkGetDeviceQueue(device, indices.presentFamily.value(), 0, &presentQueue);
 }
 
 Application::QueueFamilyIndices Application::findQueueFamilies(VkPhysicalDevice device) {
@@ -165,11 +180,18 @@ Application::QueueFamilyIndices Application::findQueueFamilies(VkPhysicalDevice 
     int i = 0;
     for (const auto &queueFamily : queueFamilies) {
         if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-            indices.graphicsFamily = i++;
+            indices.graphicsFamily = i;
         }
 
-        if (indices.graphicsFamily.has_value())
+        VkBool32 presentSupport = false;
+        vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
+        if (presentSupport)
+            indices.presentFamily = i;
+
+        if (indices.isComplete())
             break;
+
+        i++;
     }
 
     return indices;
@@ -182,7 +204,7 @@ bool Application::isDeviceSuitable(VkPhysicalDevice device) {
     /*vkGetPhysicalDeviceProperties(device, &deviceProperties);*/
     QueueFamilyIndices indices = findQueueFamilies(device);
 
-    return indices.graphicsFamily.has_value();
+    return indices.isComplete();
 }
 
 bool Application::checkValidationLayerSupport() {
