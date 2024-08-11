@@ -45,6 +45,7 @@ class Application {
     void                     createSurface();
     void                     createSwapChain();
     void                     createImageViews();
+    void                     createGraphicsPipeline();
     void                     pickPhysicalDevice();
     void                     createLogicalDevice();
     VkSurfaceFormatKHR       chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);

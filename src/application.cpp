@@ -191,6 +191,9 @@ void Application::createImageViews() {
     }
 }
 
+void Application::createGraphicsPipeline() {
+}
+
 void Application::pickPhysicalDevice() {
     uint32_t deviceCount = 0;
     vkEnumeratePhysicalDevices(_instance, &deviceCount, nullptr);
