@@ -25,33 +25,35 @@ class Application {
     };
 
   private:
-    VkInstance              _instance;
-    VkSurfaceKHR            _surface;
-    VkPhysicalDevice        _physicalDevice = VK_NULL_HANDLE; // Physical device is implicitly destroyed when instance is destroyed
-    VkDevice                _device;
-    VkQueue                 _graphicQueue;
-    VkQueue                 _presentQueue;
-    VkSwapchainKHR          _swapChain;
-    class GLFWwindow       *_window;
-    std::vector<VkImage>    _swapChainImages;
-    VkFormat                _swapChainImageFormat;
-    VkExtent2D              _swapChainExtent;
-    void                    initVulkan();
-    void                    mainLoop();
-    void                    cleanup();
-    void                    initWindow();
-    void                    createInstance();
-    void                    createSurface();
-    void                    createSwapChain();
-    void                    pickPhysicalDevice();
-    void                    createLogicalDevice();
-    VkSurfaceFormatKHR      chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
-    VkPresentModeKHR        chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &);
-    VkExtent2D              chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities);
-    QueueFamilyIndices      findQueueFamilies(VkPhysicalDevice device);
-    SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
-    bool                    isDeviceSuitable(VkPhysicalDevice device);
-    bool                    checkValidationLayerSupport();
-    bool                    checkDeviceExtensionSupport(VkPhysicalDevice device);
+    VkInstance               _instance;
+    VkSurfaceKHR             _surface;
+    VkPhysicalDevice         _physicalDevice = VK_NULL_HANDLE; // Physical device is implicitly destroyed when instance is destroyed
+    VkDevice                 _device;
+    VkQueue                  _graphicQueue;
+    VkQueue                  _presentQueue;
+    VkSwapchainKHR           _swapChain;
+    class GLFWwindow        *_window;
+    std::vector<VkImage>     _swapChainImages;
+    std::vector<VkImageView> _swapChainImageViews;
+    VkFormat                 _swapChainImageFormat;
+    VkExtent2D               _swapChainExtent;
+    void                     initVulkan();
+    void                     mainLoop();
+    void                     cleanup();
+    void                     initWindow();
+    void                     createInstance();
+    void                     createSurface();
+    void                     createSwapChain();
+    void                     createImageViews();
+    void                     pickPhysicalDevice();
+    void                     createLogicalDevice();
+    VkSurfaceFormatKHR       chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
+    VkPresentModeKHR         chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &);
+    VkExtent2D               chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities);
+    QueueFamilyIndices       findQueueFamilies(VkPhysicalDevice device);
+    SwapChainSupportDetails  querySwapChainSupport(VkPhysicalDevice device);
+    bool                     isDeviceSuitable(VkPhysicalDevice device);
+    bool                     checkValidationLayerSupport();
+    bool                     checkDeviceExtensionSupport(VkPhysicalDevice device);
 };
 #endif
