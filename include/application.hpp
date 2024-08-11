@@ -32,6 +32,7 @@ class Application {
     VkQueue                  _graphicQueue;
     VkQueue                  _presentQueue;
     VkSwapchainKHR           _swapChain;
+    VkPipelineLayout         _pipelineLayout;
     class GLFWwindow        *_window;
     std::vector<VkImage>     _swapChainImages;
     std::vector<VkImageView> _swapChainImageViews;
@@ -51,6 +52,7 @@ class Application {
     VkSurfaceFormatKHR       chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
     VkPresentModeKHR         chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &);
     VkExtent2D               chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities);
+    VkShaderModule           createShaderModule(const std::vector<char> &);
     QueueFamilyIndices       findQueueFamilies(VkPhysicalDevice device);
     SwapChainSupportDetails  querySwapChainSupport(VkPhysicalDevice device);
     bool                     isDeviceSuitable(VkPhysicalDevice device);
