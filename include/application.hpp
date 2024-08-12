@@ -32,7 +32,9 @@ class Application {
     VkQueue                  _graphicQueue;
     VkQueue                  _presentQueue;
     VkSwapchainKHR           _swapChain;
+    VkRenderPass             _renderPass;
     VkPipelineLayout         _pipelineLayout;
+    VkPipeline               _graphicsPipeline;
     class GLFWwindow        *_window;
     std::vector<VkImage>     _swapChainImages;
     std::vector<VkImageView> _swapChainImageViews;
@@ -47,6 +49,7 @@ class Application {
     void                     createSwapChain();
     void                     createImageViews();
     void                     createGraphicsPipeline();
+    void                     createRenderPass();
     void                     pickPhysicalDevice();
     void                     createLogicalDevice();
     VkSurfaceFormatKHR       chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
