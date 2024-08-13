@@ -43,10 +43,14 @@ class Application {
     std::vector<VkFramebuffer> _swapChainFrameBuffers;
     VkFormat                   _swapChainImageFormat;
     VkExtent2D                 _swapChainExtent;
+    VkSemaphore                _imageAvailableSemaphore;
+    VkSemaphore                _renderFinishedSemaphore;
+    VkFence                    _inFlightFence;
     void                       initVulkan();
     void                       mainLoop();
     void                       cleanup();
     void                       initWindow();
+    void                       createSyncObjects();
     void                       createInstance();
     void                       createSurface();
     void                       createSwapChain();
@@ -57,6 +61,7 @@ class Application {
     void                       createCommandPool();
     void                       createCommandBuffer();
     void                       recordCommandBuffer(VkCommandBuffer, uint32_t);
+    void                       drawFrame();
     void                       pickPhysicalDevice();
     void                       createLogicalDevice();
     VkSurfaceFormatKHR         chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
